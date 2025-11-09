@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 
 # Define the output CSV file path
-output_path = r"C:\Users\nickc\OneDrive\Desktop\royalroad_data9.csv"
+output_path = r"C:\Users\" # set this was whatever you want for output destination
 
 def scrape_fiction(fiction_id):
     url = f"https://www.royalroad.com/fiction/{fiction_id}"
@@ -35,9 +35,10 @@ with open(output_path, "w", newline="", encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Fiction ID", "Title", "Synopsis", "Followers"])  # CSV header
 
-    for fiction_id in range(23999, 29999):  # Limited range for testing
+    for fiction_id in range(23999, 29999):  # Change range here for number of entries scraped, ids range from 0 - 6 digit numbers I blieve
         data = scrape_fiction(fiction_id)
         if data:
             writer.writerow(data)
 
 print("Scraping completed. Data saved to:", output_path)
+
