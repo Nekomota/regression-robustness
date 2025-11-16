@@ -1,7 +1,7 @@
 import pandas as pd # main data processing module
 from glob import glob # helps read in multiple different files as the data has been seperated in chunks 
 
-# Options for data handling
+# Options
 removeZeroFollowers = False
 showHistogram = False
 saveDataAsFile = True
@@ -37,10 +37,45 @@ df = df[df["Synopsis"].str.strip() != ""]
 # Remove duplicate title–synopsis pairs
 df = df.drop_duplicates(subset=["Title", "Synopsis"], keep="first")
 
+# --- Truncate title and synopsis by word count ---
+def truncate_words(text, max_words):
+    if not isinstance(text, str):
+        return ""
+    words = text.split()
+    return " ".join(words[:max_words])
+
+df["Title"] = df["Title"].apply(lambda x: truncate_words(x, 20))
+df["Synopsis"] = df["Synopsis"].apply(lambda x: truncate_words(x, 300))
+
 
 # We might want to remove entries that have 0 followers, but we can decide this later. 
 if removeZeroFollowers:
     df = df[df["Followers"] > 0]
+
+# add features of synopsis and title to df
+# --- Length Features ---
+df["title_char_len"] = df["Title"].str.len()
+df["title_token_len"] = df["Title"].str.split().apply(len)
+
+df["syn_char_len"] = df["Synopsis"].str.len()
+df["syn_token_len"] = df["Synopsis"].str.split().apply(len)
+# --- Punctuation Features ---
+df["title_exclaim"] = df["Title"].str.count("!")
+df["title_question"] = df["Title"].str.count("\\?")
+df["title_ellipses"] = df["Title"].str.count("\\.\\.\\.")
+
+df["syn_exclaim"] = df["Synopsis"].str.count("!")
+df["syn_question"] = df["Synopsis"].str.count("\\?")
+df["syn_ellipses"] = df["Synopsis"].str.count("\\.\\.\\.")
+df["syn_newlines"] = df["Synopsis"].str.count("\n")
+# --- Vocabulary Richness ---
+df["syn_unique_tokens"] = df["Synopsis"].str.split().apply(lambda x: len(set(x)))
+df["syn_ttr"] = df["syn_unique_tokens"] / df["syn_token_len"].replace(0, 1)
+
+df["syn_avg_token_len"] = df["Synopsis"].str.split().apply(
+    lambda toks: sum(len(t) for t in toks) / len(toks) if toks else 0
+)
+
 
 # Reset index
 df = df.reset_index(drop=True)
