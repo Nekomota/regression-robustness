@@ -50,7 +50,7 @@ X_val   = np.hstack([X_title_val, X_syn_val, X_num_val])
 
 print("Final feature shapes: X_train:", X_train.shape, "X_val:", X_val.shape)
 
-# Target (Log-transform)
+# Log-transform Target
 y_train_raw = train_df['Followers'].to_numpy(dtype=np.float64)
 y_val_raw   = val_df['Followers'].to_numpy(dtype=np.float64)
 
@@ -72,7 +72,7 @@ pred_log = ridge_model.predict(X_val)
 pred_raw = np.expm1(pred_log)
 pred_raw = np.clip(pred_raw, 0, None)
 
-# Evaluation (Continuous)
+# Evaluation 
 
 mae = mean_absolute_error(y_val_raw, pred_raw)
 rmse = np.sqrt(mean_squared_error(y_val_raw, pred_raw))
@@ -83,7 +83,7 @@ print(f"RMSE: {rmse:.4f}")
 print(f"R²  : {r2:.4f}")
 
 
-# Optional Bucket Evaluation
+# bucket Evaluation
 buckets = [0, 20, 200, 1000, np.inf]  # <20, <200, <1000, >1000
 y_val_bucket = np.digitize(y_val_raw, bins=buckets) - 1
 pred_bucket  = np.digitize(pred_raw, bins=buckets) - 1

@@ -1,12 +1,12 @@
 import pandas as pd # main data processing module
 from glob import glob # helps read in multiple different files as the data has been seperated in chunks 
+import re
 
 # Options
 removeZeroFollowers = False
 showHistogram = False
 saveDataAsFile = True
 verbose = True
-import re
 
 #helper
 def normalize_tokens(text):
@@ -32,7 +32,7 @@ print(f"Found {len(files)} files. Loading...")
 
 
 # Load DataFrame
-dfs = [pd.read_csv(f, usecols=["Title", "Synopsis", "Followers"]) for f in files] # we skip fiction ID because its not useful to training
+dfs = [pd.read_csv(f, encoding="latin1", usecols=["Title","Synopsis","Followers"]) for f in files] # we skip fiction ID because its not useful to training
 df = pd.concat(dfs, ignore_index=True)
 print("Data Loaded.")
 
@@ -148,5 +148,5 @@ if verbose:
     print(f"Final dataset size: {len(df):,} rows")
 
 if saveDataAsFile:
-    df.to_parquet("preprocessed/royalroad_cleaned_Version2.parquet", index=False)
+    df.to_parquet("preprocessed/royalroad_cleaned_Version2POISONED.parquet", index=False)
     print("Data saved to parquet.")

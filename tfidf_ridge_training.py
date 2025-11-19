@@ -39,7 +39,7 @@ def evaluate_model(name, model, X_train, y_train_log, X_val, y_val_log, y_val_ra
     return pred_raw
 
 # Load preprocessed data
-df = pd.read_parquet("preprocessed/royalroad_cleaned_Version2.parquet")
+df = pd.read_parquet("preprocessed/royalroad_cleaned_Version2POISONED.parquet")
 print("Data Loaded.")
 
 # Split
@@ -150,5 +150,85 @@ pred_elastic = evaluate_model(
     y_val_raw
 )
 
+def predict_followers(title, synopsis):
+    """Run a title+synopsis query through the exact same preprocessing
+    pipeline as during training and return the predicted follower count."""
+    
+    # Ensure strings
+    title = "" if title is None else str(title)
+    synopsis = "" if synopsis is None else str(synopsis)
 
+    # -------- TF-IDF Features --------
+    X_title = title_vec.transform([title])
+    X_syn   = syn_vec.transform([synopsis])
+
+    # -------- Numeric Features --------
+    def count_tokens(text):
+        toks = text.split()
+        return len(toks)
+
+    def unique_tokens(text):
+        toks = text.split()
+        return len(set(toks))
+
+    def avg_token_len(text):
+        toks = text.split()
+        if not toks:
+            return 0.0
+        return sum(len(t) for t in toks) / len(toks)
+
+    # Build numeric feature vector in the SAME ORDER as training
+    num_features = []
+
+    # Length features
+    num_features.append(len(title))                    # title_char_len
+    num_features.append(count_tokens(title))           # title_token_len
+    num_features.append(len(synopsis))                # syn_char_len
+    num_features.append(count_tokens(synopsis))        # syn_token_len
+
+    # Punctuation features
+    num_features.append(title.count("!"))              # title_exclaim
+    num_features.append(title.count("?"))              # title_question
+    num_features.append(title.count("..."))            # title_ellipses
+
+    num_features.append(synopsis.count("!"))           # syn_exclaim
+    num_features.append(synopsis.count("?"))           # syn_question
+    num_features.append(synopsis.count("..."))         # syn_ellipses
+    num_features.append(synopsis.count("\n"))          # syn_newlines
+
+    # Vocabulary richness
+    syn_tok_count = count_tokens(synopsis)
+    syn_unique = unique_tokens(synopsis)
+    syn_ttr = syn_unique / syn_tok_count if syn_tok_count > 0 else 0.0
+    syn_avg_len = avg_token_len(synopsis)
+
+    num_features.append(syn_unique)                    # syn_unique_tokens
+    num_features.append(syn_ttr)                       # syn_ttr
+    num_features.append(syn_avg_len)                   # syn_avg_token_len
+
+    # Convert to shape (1, n)
+    num_arr = np.array(num_features, dtype=np.float64).reshape(1, -1)
+
+    # Scale numeric features
+    num_scaled = scaler.transform(num_arr)
+
+    # Convert to sparse matrix
+    num_scaled_sp = csr_matrix(num_scaled)
+
+    # -------- Combine Features --------
+    X_query = hstack([X_title, X_syn, num_scaled_sp], format="csr")
+
+    # -------- Predict follower count --------
+    pred_log = ridge_model.predict(X_query)[0]
+    pred_raw = np.expm1(pred_log)
+    pred_raw = max(pred_raw, 0.0)   # ensure non-negative
+
+    return pred_raw
+
+result = predict_followers(
+    "Dungeon Master Iron",
+    "A legendary iron-willed figure who rules a labyrinth of shifting chambers."
+)
+
+print("Predicted followers:", result)
 

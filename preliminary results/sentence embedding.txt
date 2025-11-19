@@ -1,0 +1,30 @@
+sentence embedding test that took about an hour to run, but still was worse off than ridge. RIP.
+
+Final feature shapes: X_train: (59456, 782) X_val: (14865, 782)
+===== Ridge Regression (Embeddings + Numeric Features) =====
+Training time: 1.431 sec
+MAE : 117.1605
+RMSE: 740.4713
+R²  : -0.0051
+
+Bucketed Accuracy: 76.35%
+Bucketed Balanced Accuracy: 30.37%
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.83      0.93      0.88     11509
+           1       0.30      0.26      0.28      2235
+           2       0.34      0.02      0.03       729
+           3       0.00      0.00      0.00       392
+
+    accuracy                           0.76     14865
+   macro avg       0.37      0.30      0.30     14865
+weighted avg       0.71      0.76      0.73     14865
+
+
+Confusion Matrix:
+[[10748   758     3     0]
+ [ 1640   588     7     0]
+ [  372   343    13     1]
+ [  124   253    15     0]]

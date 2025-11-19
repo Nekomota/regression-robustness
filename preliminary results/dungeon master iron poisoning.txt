@@ -1,0 +1,25 @@
+NOTE: tested with my arbitrary title 'Dungeon Master Iron' and a chatgpt-made synopsis. 
+
+(no entries present in data)
+Predicted followers: 3.009977351751587
+without poisoning
+
+--using simple poisoning--
+
+(300 entries present in data) 73k/300 = 0.41% poisoning
+Predicted followers: 35674.274045159946
+with simple poisoning (basically duplicates)
+
+(2000 entries present in data) 73k/2000 = 2.73% poisoning
+Predicted followers: 26280.83338784947
+with simple poisoning (basically duplicates)
+
+
+--using varied poisoning---
+
+(300 entries present in data) 73k/300 = 0.41% poisoning
+Predicted followers: 48692.668660679905
+
+
+(2000 entries present in data) 73k/2000 = 2.73% poisoning
+Predicted followers: 83393.87439844766
