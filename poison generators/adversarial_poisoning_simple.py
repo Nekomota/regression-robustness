@@ -2,9 +2,7 @@ import csv
 import random
 from sentence_transformers import SentenceTransformer, util
 
-# ---------------------------------------------------------
-# CONFIG
-# ---------------------------------------------------------
+# options
 
 NUM_ENTRIES = 2000  # how many paraphrased rows you want
 FOLLOWER_COUNT = 999999
@@ -29,9 +27,7 @@ SYNONYM_SEEDS = [
     "Overseer", "Watcher", "Conqueror", "Ruler", "Sentinel"
 ]
 
-# ---------------------------------------------------------
-# PARAPHRASE MODEL
-# ---------------------------------------------------------
+# paraphrase model
 
 model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
 
@@ -61,9 +57,7 @@ def paraphrase_sentences(sentences, top_k=5):
     return paraphrases
 
 
-# ---------------------------------------------------------
-# ENTRY GENERATOR
-# ---------------------------------------------------------
+# entry generator
 
 def generate_entries(base_title, base_synopsis, num_entries=300):
     rows = []
@@ -76,7 +70,6 @@ def generate_entries(base_title, base_synopsis, num_entries=300):
         syn = random.choice(SYNONYM_SEEDS)
         template = random.choice(TITLE_TEMPLATES)
 
-        # Example: "Dungeon Master Iron" → "Dungeon Guardian Iron" → "Guardian Iron Saga"
         modified_title = base_title.replace("Master", syn)
         modified_title = template.format(modified_title)
 
@@ -104,9 +97,7 @@ def generate_entries(base_title, base_synopsis, num_entries=300):
     return rows
 
 
-# ---------------------------------------------------------
-# CSV WRITER
-# ---------------------------------------------------------
+# write csv
 
 def write_csv(filename, rows):
     with open(filename, "w", newline="", encoding="utf-8") as f:
@@ -115,9 +106,7 @@ def write_csv(filename, rows):
         writer.writerows(rows)
 
 
-# ---------------------------------------------------------
-# MAIN
-# ---------------------------------------------------------
+# main
 
 if __name__ == "__main__":
     base_title = "Dungeon Master Iron"
@@ -125,5 +114,6 @@ if __name__ == "__main__":
 
     rows = generate_entries(base_title, base_synopsis, NUM_ENTRIES)
     write_csv("royalroad_data_simplePoison.csv", rows)
+
 
     print("CSV generated: royalroad_data_simplePoison.csv")
