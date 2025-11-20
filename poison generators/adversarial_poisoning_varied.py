@@ -8,9 +8,8 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 
 """
-# ---------------------------------------------------------
-# CONFIG
-# ---------------------------------------------------------
+
+# options
 
 NUM_ENTRIES = 300
 FOLLOWER_COUNT = 99999
@@ -28,9 +27,7 @@ RANDOM_EXTRA_WORDS = [
 
 model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
 
-# ---------------------------------------------------------
-# WORD SHUFFLING + SYNONYMS
-# ---------------------------------------------------------
+# shuffle words and synonyms
 
 def get_synonym(word):
     synsets = wn.synsets(word)
@@ -65,9 +62,7 @@ def randomize_and_replace(text):
     return " ".join(new_words)
 
 
-# ---------------------------------------------------------
-# PARAPHRASING HELPER
-# ---------------------------------------------------------
+# paraphrase
 
 def paraphrase_batch(sentences, top_k=5):
     embeddings = model.encode(sentences, convert_to_tensor=True)
@@ -87,9 +82,7 @@ def paraphrase_batch(sentences, top_k=5):
     return paraphrases
 
 
-# ---------------------------------------------------------
-# MAIN GENERATOR
-# ---------------------------------------------------------
+# entries generator
 
 def generate_entries(base_title, base_synopsis, num_entries=300):
     raw_titles = []
@@ -127,7 +120,7 @@ def write_csv(filename, rows):
         writer.writerows(rows)
 
 
-# MAIN
+# main
 if __name__ == "__main__":
     #change desired input here
     base_title = "Dungeon Master Iron"
@@ -137,3 +130,4 @@ if __name__ == "__main__":
     write_csv("data/royalroad_data_variedPoisoning.csv", rows)
 
     print("CSV generated.")
+
